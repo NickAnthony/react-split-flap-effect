@@ -1,0 +1,24 @@
+{
+  "compilerOptions": {
+    /* Emit / module options */
+    "module": "esnext",
+    "target": "es2017",
+    "jsx": "react-jsx", // or "react" for React 17- style
+
+    /* Type-safety toggles you can tighten later */
+    "strict": false, // turn on when you’re ready
+    "noImplicitAny": false, // turn on when you’re ready
+
+    /* Key settings for gradual migration 👇 */
+    "allowJs": true, // let the compiler “see” .js files
+    "checkJs": false, // but DON’T type-check them yet
+    "noEmit": true, // let Babel / webpack handle output
+
+    /* Convenience */
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true
+  },
+  "include": ["src/**/*"], // point at your code
+  "exclude": ["node_modules"]
+}
