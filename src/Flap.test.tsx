@@ -1,5 +1,6 @@
 /* eslint-env jest */
 import { render, screen } from "@testing-library/react";
+import React from "react";
 import { Flap } from "./Flap";
 
 jest.mock("./styles.css", () => ({
