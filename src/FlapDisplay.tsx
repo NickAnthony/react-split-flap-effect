@@ -118,13 +118,7 @@ export const FlapDisplay: React.FC<FlapDisplayProps> = ({
   return render ? (
     render({ id, className, css, ...restProps, children })
   ) : (
-    <div
-      id={id}
-      className={className}
-      css={css}
-      aria-hidden="true"
-      aria-label={value}
-    >
+    <div id={id} className={className} aria-hidden="true" aria-label={value}>
       {children}
     </div>
   );

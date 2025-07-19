@@ -1,5 +1,6 @@
 /* eslint-env jest */
 import { act, render } from "@testing-library/react";
+import React from "react";
 import { FlapStack } from "./FlapStack";
 
 jest.mock("./styles.css", () => ({
@@ -12,8 +13,14 @@ jest.mock("./styles.css", () => ({
   hinge: "hinge"
 }));
 
+interface FlapStackTestProps {
+  stack: string[];
+  value: string;
+  timing: number;
+}
+
 describe("<FlapStack/>", () => {
-  let props;
+  let props: FlapStackTestProps;
 
   beforeEach(() => {
     props = {
@@ -39,7 +46,7 @@ describe("<FlapStack/>", () => {
 
   it("renders the digit in the initial position", () => {
     const { container } = render(<FlapStack {...props} />);
-    const digit = container.querySelector('[data-kind="digit"]');
+    const digit = container.querySelector('[data-kind="digit"]') as HTMLElement;
     const flaps = digit.querySelectorAll(".flap");
 
     // Initial position shows first character in stack (space)
@@ -70,7 +77,7 @@ describe("<FlapStack/>", () => {
       jest.advanceTimersByTime(props.timing);
     });
 
-    const digit = container.querySelector('[data-kind="digit"]');
+    const digit = container.querySelector('[data-kind="digit"]') as HTMLElement;
     const flaps = digit.querySelectorAll(".flap");
 
     // After one interval, should show 'A' (second position)
@@ -88,7 +95,7 @@ describe("<FlapStack/>", () => {
       jest.runAllTimers();
     });
 
-    const digit = container.querySelector('[data-kind="digit"]');
+    const digit = container.querySelector('[data-kind="digit"]') as HTMLElement;
     const flaps = digit.querySelectorAll(".flap");
 
     // Should now show 'Z' (final position)
@@ -104,7 +111,7 @@ describe("<FlapStack/>", () => {
 
   it("passes mode prop down", () => {
     const { container } = render(<FlapStack {...props} mode="alpha" />);
-    const digit = container.querySelector('[data-kind="digit"]');
+    const digit = container.querySelector('[data-kind="digit"]') as HTMLElement;
 
     expect(digit).toHaveAttribute("data-mode", "alpha");
   });
@@ -125,7 +132,7 @@ describe("<FlapStack/>", () => {
       jest.runAllTimers();
     });
 
-    let digit = container.querySelector('[data-kind="digit"]');
+    let digit = container.querySelector('[data-kind="digit"]') as HTMLElement;
     let flaps = digit.querySelectorAll(".flap");
     expect(flaps[0].textContent).toBe("Z");
 
@@ -134,7 +141,7 @@ describe("<FlapStack/>", () => {
     rerender(<FlapStack {...newProps} />);
 
     // Should reset to initial position (first character of new stack)
-    digit = container.querySelector('[data-kind="digit"]');
+    digit = container.querySelector('[data-kind="digit"]') as HTMLElement;
     flaps = digit.querySelectorAll(".flap");
     expect(flaps[0].textContent).toBe("1");
   });

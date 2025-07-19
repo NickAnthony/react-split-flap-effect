@@ -10,9 +10,16 @@ jest.mock("./styles.css", () => ({
   hinge: "hinge"
 }));
 
+interface FlapTestProps {
+  bottom: boolean;
+  animated: boolean;
+  final: boolean;
+  hinge: boolean;
+}
+
 describe("<Flap/>", () => {
-  let props;
-  let text;
+  let props: FlapTestProps;
+  let text: string;
 
   beforeEach(() => {
     props = {
@@ -28,7 +35,7 @@ describe("<Flap/>", () => {
   describe("when all props are false", () => {
     it("has appropriate class names", () => {
       const { container } = render(<Flap {...props}>{text}</Flap>);
-      const div = container.firstChild;
+      const div = container.firstChild as HTMLElement;
 
       expect(div).not.toHaveClass("bottom");
       expect(div).toHaveClass("top");
@@ -54,7 +61,7 @@ describe("<Flap/>", () => {
           {text}
         </Flap>
       );
-      const div = container.firstChild;
+      const div = container.firstChild as HTMLElement;
 
       expect(div).toHaveClass("bottom");
     });
@@ -65,7 +72,7 @@ describe("<Flap/>", () => {
           {text}
         </Flap>
       );
-      const div = container.firstChild;
+      const div = container.firstChild as HTMLElement;
 
       expect(div).not.toHaveClass("top");
     });
@@ -78,7 +85,7 @@ describe("<Flap/>", () => {
           {text}
         </Flap>
       );
-      const div = container.firstChild;
+      const div = container.firstChild as HTMLElement;
 
       expect(div).toHaveClass("animated");
     });
@@ -91,7 +98,7 @@ describe("<Flap/>", () => {
           {text}
         </Flap>
       );
-      const div = container.firstChild;
+      const div = container.firstChild as HTMLElement;
 
       expect(div).toHaveClass("final");
     });
@@ -116,7 +123,9 @@ describe("<Flap/>", () => {
           {text}
         </Flap>
       );
-      const hinge = container.querySelector('[data-kind="hinge"]');
+      const hinge = container.querySelector(
+        '[data-kind="hinge"]'
+      ) as HTMLElement;
 
       expect(hinge).toHaveClass("hinge");
     });

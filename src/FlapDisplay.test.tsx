@@ -1,5 +1,6 @@
 /* eslint-env jest */
 import { render } from "@testing-library/react";
+import React from "react";
 import { FlapDisplay } from "./FlapDisplay";
 
 jest.mock("./styles.css", () => ({
@@ -11,8 +12,16 @@ jest.mock("./styles.css", () => ({
   hinge: "hinge"
 }));
 
+interface FlapDisplayTestProps {
+  value: string;
+  length: number;
+  chars: string;
+  hinge: boolean;
+  timing: number;
+}
+
 describe("<FlapDisplay/>", () => {
-  let props;
+  let props: FlapDisplayTestProps;
 
   beforeEach(() => {
     props = {
@@ -28,20 +37,20 @@ describe("<FlapDisplay/>", () => {
     const { container } = render(
       <FlapDisplay {...props} className="classNameSentinel" />
     );
-    const displayDiv = container.firstChild;
+    const displayDiv = container.firstChild as HTMLElement;
     expect(displayDiv).toHaveClass("classNameSentinel");
   });
 
   it("applies a custom id", () => {
     const { container } = render(<FlapDisplay {...props} id="IdSentinel" />);
-    const displayDiv = container.firstChild;
+    const displayDiv = container.firstChild as HTMLElement;
     expect(displayDiv).toHaveAttribute("id", "IdSentinel");
   });
 
   it("passes the css prop", () => {
     const cssSentinel = { foo: "bar" };
     const { container } = render(<FlapDisplay {...props} css={cssSentinel} />);
-    const displayDiv = container.firstChild;
+    const displayDiv = container.firstChild as HTMLElement;
     // CSS prop is typically handled by styled-components or emotion
     // We can check if the element exists but can't directly test the css prop
     expect(displayDiv).toBeInTheDocument();
@@ -107,7 +116,9 @@ describe("<FlapDisplay/>", () => {
     it("passes props to the render func", () => {
       const Render = jest.fn(() => <div>Custom Render</div>);
       render(<FlapDisplay {...props} render={Render} />);
-      const args = { ...Render.mock.calls[0][0] };
+      expect(Render).toHaveBeenCalled();
+      const firstCallArgs = (Render.mock.calls[0] as any[])[0];
+      const args = { ...firstCallArgs };
       delete args.children;
       // The render function receives only the display-specific props
       expect(args).toEqual({
@@ -120,8 +131,11 @@ describe("<FlapDisplay/>", () => {
     it("passes children to the render func", () => {
       const Render = jest.fn(() => <div>Custom Render</div>);
       render(<FlapDisplay {...props} render={Render} />);
-      const args = Render.mock.calls.pop();
-      expect(args[0].children.length).toEqual(2);
+      expect(Render).toHaveBeenCalled();
+      const lastCallArgs = (Render.mock.calls[
+        Render.mock.calls.length - 1
+      ] as any[])[0];
+      expect(lastCallArgs.children.length).toEqual(2);
     });
   });
 

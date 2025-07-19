@@ -1,5 +1,6 @@
 /* eslint-env jest */
 import { render } from "@testing-library/react";
+import React from "react";
 import { FlapDigit } from "./FlapDigit";
 
 jest.mock("./styles.css", () => ({
@@ -11,8 +12,15 @@ jest.mock("./styles.css", () => ({
   final: "final"
 }));
 
+interface FlapDigitTestProps {
+  value: string;
+  prevValue: string;
+  final: boolean;
+  mode: string;
+}
+
 describe("<FlapDigit/>", () => {
-  let props;
+  let props: FlapDigitTestProps;
 
   beforeEach(() => {
     props = {
@@ -26,7 +34,7 @@ describe("<FlapDigit/>", () => {
   describe("child div", () => {
     it("exists with correct attributes and class", () => {
       const { container } = render(<FlapDigit {...props} />);
-      const div = container.firstChild;
+      const div = container.firstChild as HTMLElement;
 
       expect(div).toBeInTheDocument();
       expect(div.tagName).toBe("DIV");
@@ -39,7 +47,9 @@ describe("<FlapDigit/>", () => {
   describe("child <Flap/>s", () => {
     it("renders three flaps in non-final mode", () => {
       const { container } = render(<FlapDigit {...props} />);
-      const digitDiv = container.querySelector('[data-kind="digit"]');
+      const digitDiv = container.querySelector(
+        '[data-kind="digit"]'
+      ) as HTMLElement;
       const flaps = digitDiv.children;
 
       expect(flaps).toHaveLength(3);
@@ -47,8 +57,10 @@ describe("<FlapDigit/>", () => {
 
     it("configures the first <Flap/> (top current)", () => {
       const { container } = render(<FlapDigit {...props} />);
-      const digitDiv = container.querySelector('[data-kind="digit"]');
-      const firstFlap = digitDiv.children[0];
+      const digitDiv = container.querySelector(
+        '[data-kind="digit"]'
+      ) as HTMLElement;
+      const firstFlap = digitDiv.children[0] as HTMLElement;
 
       expect(firstFlap).toHaveTextContent(props.value);
       expect(firstFlap).toHaveClass("flap");
@@ -60,8 +72,10 @@ describe("<FlapDigit/>", () => {
 
     it("configures the second <Flap/> (bottom previous)", () => {
       const { container } = render(<FlapDigit {...props} />);
-      const digitDiv = container.querySelector('[data-kind="digit"]');
-      const secondFlap = digitDiv.children[1];
+      const digitDiv = container.querySelector(
+        '[data-kind="digit"]'
+      ) as HTMLElement;
+      const secondFlap = digitDiv.children[1] as HTMLElement;
 
       expect(secondFlap).toHaveTextContent(props.prevValue);
       expect(secondFlap).toHaveClass("flap");
@@ -73,8 +87,10 @@ describe("<FlapDigit/>", () => {
 
     it("configures the third <Flap/> (animated top previous)", () => {
       const { container } = render(<FlapDigit {...props} />);
-      const digitDiv = container.querySelector('[data-kind="digit"]');
-      const thirdFlap = digitDiv.children[2];
+      const digitDiv = container.querySelector(
+        '[data-kind="digit"]'
+      ) as HTMLElement;
+      const thirdFlap = digitDiv.children[2] as HTMLElement;
 
       expect(thirdFlap).toHaveTextContent(props.prevValue);
       expect(thirdFlap).toHaveClass("flap");
@@ -93,7 +109,9 @@ describe("<FlapDigit/>", () => {
     describe("child <Flap/>s", () => {
       it("renders four flaps in final mode", () => {
         const { container } = render(<FlapDigit {...props} />);
-        const digitDiv = container.querySelector('[data-kind="digit"]');
+        const digitDiv = container.querySelector(
+          '[data-kind="digit"]'
+        ) as HTMLElement;
         const flaps = digitDiv.children;
 
         expect(flaps).toHaveLength(4);
@@ -101,8 +119,10 @@ describe("<FlapDigit/>", () => {
 
       it("configures the first <Flap/> (static top current)", () => {
         const { container } = render(<FlapDigit {...props} />);
-        const digitDiv = container.querySelector('[data-kind="digit"]');
-        const firstFlap = digitDiv.children[0];
+        const digitDiv = container.querySelector(
+          '[data-kind="digit"]'
+        ) as HTMLElement;
+        const firstFlap = digitDiv.children[0] as HTMLElement;
 
         expect(firstFlap).toHaveTextContent(props.value);
         expect(firstFlap).toHaveClass("flap");
@@ -114,8 +134,10 @@ describe("<FlapDigit/>", () => {
 
       it("configures the second <Flap/> (static bottom previous)", () => {
         const { container } = render(<FlapDigit {...props} />);
-        const digitDiv = container.querySelector('[data-kind="digit"]');
-        const secondFlap = digitDiv.children[1];
+        const digitDiv = container.querySelector(
+          '[data-kind="digit"]'
+        ) as HTMLElement;
+        const secondFlap = digitDiv.children[1] as HTMLElement;
 
         expect(secondFlap).toHaveTextContent(props.prevValue);
         expect(secondFlap).toHaveClass("flap");
@@ -127,8 +149,10 @@ describe("<FlapDigit/>", () => {
 
       it("configures the third <Flap/> (animated top previous with final)", () => {
         const { container } = render(<FlapDigit {...props} />);
-        const digitDiv = container.querySelector('[data-kind="digit"]');
-        const thirdFlap = digitDiv.children[2];
+        const digitDiv = container.querySelector(
+          '[data-kind="digit"]'
+        ) as HTMLElement;
+        const thirdFlap = digitDiv.children[2] as HTMLElement;
 
         expect(thirdFlap).toHaveTextContent(props.prevValue);
         expect(thirdFlap).toHaveClass("flap");
@@ -140,8 +164,10 @@ describe("<FlapDigit/>", () => {
 
       it("configures the fourth <Flap/> (animated bottom current with final)", () => {
         const { container } = render(<FlapDigit {...props} />);
-        const digitDiv = container.querySelector('[data-kind="digit"]');
-        const fourthFlap = digitDiv.children[3];
+        const digitDiv = container.querySelector(
+          '[data-kind="digit"]'
+        ) as HTMLElement;
+        const fourthFlap = digitDiv.children[3] as HTMLElement;
 
         expect(fourthFlap).toHaveTextContent(props.value);
         expect(fourthFlap).toHaveClass("flap");
@@ -157,17 +183,21 @@ describe("<FlapDigit/>", () => {
     const { container } = render(
       <FlapDigit {...props} value="X" prevValue=" " />
     );
-    const digitDiv = container.querySelector('[data-kind="digit"]');
-    const secondFlap = digitDiv.children[1];
+    const digitDiv = container.querySelector(
+      '[data-kind="digit"]'
+    ) as HTMLElement;
+    const secondFlap = digitDiv.children[1] as HTMLElement;
 
-    // Space character is preserved
+    // Space character might render as empty string
     expect(secondFlap.textContent).toBe(" ");
   });
 
   it("passes props down to child flaps (excluding specific props)", () => {
     // The component filters out certain props, so we need to test with a prop that gets passed through
     const { container } = render(<FlapDigit {...props} hinge={true} />);
-    const digitDiv = container.querySelector('[data-kind="digit"]');
+    const digitDiv = container.querySelector(
+      '[data-kind="digit"]'
+    ) as HTMLElement;
 
     // Check if hinge divs are present inside flaps
     const hingeElements = digitDiv.querySelectorAll('[data-kind="hinge"]');
