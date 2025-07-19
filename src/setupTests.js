@@ -1,8 +1,6 @@
-const { configure, mount, render, shallow } = require('enzyme')
-const EnzymeAdapter = require('enzyme-adapter-react-16')
+// Setup for React Testing Library
+// This extends Jest matchers with custom matchers for testing DOM elements
+import "@testing-library/jest-dom";
 
-configure({ adapter: new EnzymeAdapter() })
-global.shallow = shallow
-global.mount = mount
-global.render = render
-global.React = require('react')
+// Make React available globally for tests
+global.React = require("react");
