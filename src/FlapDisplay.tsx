@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { FlapStack } from "./FlapStack";
+import { FlapStackCSS } from "./FlapStackCSS";
 import { Presets } from "./Presets";
 
 const Modes = {
@@ -31,6 +32,7 @@ export interface FlapDisplayProps {
   timing?: number;
   hinge?: boolean;
   render?: (props: RenderProps) => React.ReactElement;
+  useCss?: boolean;
   // Additional props that will be passed to FlapStack
   [key: string]: any;
 }
@@ -63,8 +65,9 @@ export const FlapDisplay: React.FC<FlapDisplayProps> = ({
   padChar = " ",
   padMode = "auto",
   render,
-  timing = 30,
+  timing = 300,
   hinge = true,
+  useCss = true,
   ...restProps
 }) => {
   const [stack, setStack] = useState<string[]>([]);
@@ -74,10 +77,17 @@ export const FlapDisplay: React.FC<FlapDisplayProps> = ({
 
   useEffect(() => {
     if (words && words.length) {
-      setStack(words);
+      // Add blank to words if not already present
+      const stackWithBlank = words.includes(" ") ? words : [...words, " "];
+      setStack(stackWithBlank);
       setMode(Modes.Words);
     } else {
-      setStack(splitChars(chars));
+      const charArray = splitChars(chars);
+      // Always add a blank character at the end if not already present
+      const stackWithBlank = charArray.includes(" ")
+        ? charArray
+        : [...charArray, " "];
+      setStack(stackWithBlank);
       setMode(chars.match(/[a-z]/i) ? Modes.Alphanumeric : Modes.Numeric);
     }
   }, [chars, words]);
@@ -100,9 +110,11 @@ export const FlapDisplay: React.FC<FlapDisplayProps> = ({
   }, [value, chars, words, length, padChar, padMode]);
 
   useEffect(() => {
+    const StackComponent = useCss ? FlapStackCSS : FlapStack;
+
     setChildren(
       digits.map((digit, i) => (
-        <FlapStack
+        <StackComponent
           key={i}
           stack={stack}
           value={digit}
@@ -113,7 +125,7 @@ export const FlapDisplay: React.FC<FlapDisplayProps> = ({
         />
       ))
     );
-  }, [digits, stack, mode, timing, hinge, ...Object.values(restProps)]);
+  }, [digits, stack, mode, timing, hinge, useCss, ...Object.values(restProps)]);
 
   return render ? (
     render({ id, className, css, ...restProps, children })

@@ -1,8 +1,10 @@
 /* eslint-disable react/jsx-fragments */
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { FlapDisplay, Presets } from "react-split-flap-effect";
-import "react-split-flap-effect/extras/themes.css";
+// import "react-split-flap-effect/extras/themes.css";
 import "./index.css";
+import { PerformanceTest } from "./PerformanceTest";
+import { TripleDigit } from "./TripleDigit";
 
 const Words = [
   "",
@@ -26,18 +28,21 @@ type Mode = typeof Modes[keyof typeof Modes];
 type PadMode = "auto" | "start" | "end";
 
 export const App: React.FC = () => {
-  const [mode, setMode] = useState<Mode>(Modes.Numeric);
+  const [showPerformanceTest, setShowPerformanceTest] = useState(false);
+  const [showTripleDigit, setShowTripleDigit] = useState(true);
   const [autoplay, setAutoplay] = useState(true);
+  const [mode, setMode] = useState<Mode>(Modes.Numeric);
   const [theme, setTheme] = useState("");
   const [colorScheme, setColorScheme] = useState("");
   const [chars, setChars] = useState(Presets.NUM);
-  const [words, setWords] = useState<readonly string[]>(Words);
+  const [words, setWords] = useState(["REACT", "SPLIT", "FLAP", "EFFECT"]);
   const [length, setLength] = useState(6);
-  const [timing, setTiming] = useState(30);
+  const [timing, setTiming] = useState(500);
   const [padChar, setPadChar] = useState(" ");
   const [padMode, setPadMode] = useState<PadMode>("auto");
   const [value, setValue] = useState("");
   const [hinge, setHinge] = useState(true);
+  const [useCss, setUseCss] = useState(true);
 
   const modeRef = useRef(mode);
   modeRef.current = mode;
@@ -56,10 +61,20 @@ export const App: React.FC = () => {
     const length = lengthRef.current;
     const words = wordsRef.current;
 
-    if (mode === Modes.Numeric) {
-      return String(randomNum(0, 10 ** length - 1));
-    } else {
-      return words[Math.floor(Math.random() * (words.length - 1)) + 1];
+    switch (mode) {
+      case Modes.Numeric:
+        return randomNum(10 ** (length - 1), 10 ** length - 1).toString();
+      case Modes.Alphanumeric:
+        return Array(length)
+          .fill(null)
+          .map(
+            () => Presets.ALPHANUM[randomNum(0, Presets.ALPHANUM.length - 1)]
+          )
+          .join("");
+      case Modes.Words:
+        return words[randomNum(0, words.length - 1)];
+      default:
+        return "";
     }
   }, []);
 
@@ -71,16 +86,27 @@ export const App: React.FC = () => {
   useEffect(() => {
     if (autoplay) {
       setValue(randomValue());
-      const timing = mode === Modes.Alphanumeric ? 6000 : 3000;
-      const timer = setInterval(() => {
+      const interval = setInterval(() => {
         setValue(randomValue());
-      }, timing);
-
-      return () => {
-        clearTimeout(timer);
-      };
+      }, 3000);
+      return () => clearInterval(interval);
     }
-  }, [mode, autoplay, randomValue]);
+  }, [autoplay, randomValue]);
+
+  if (showPerformanceTest) {
+    return (
+      <div>
+        <button onClick={() => setShowPerformanceTest(false)}>
+          Back to Demo
+        </button>
+        <PerformanceTest />
+      </div>
+    );
+  }
+
+  if (showTripleDigit) {
+    return <TripleDigit />;
+  }
 
   return (
     <div className="page-container">
@@ -95,9 +121,26 @@ export const App: React.FC = () => {
           hinge={hinge}
           padChar={padChar}
           padMode={padMode}
+          useCss={useCss}
         />
       </div>
+
       <form onSubmit={e => e.preventDefault()}>
+        <div className="row">
+          <div className="full">
+            <h2>Animation Mode</h2>
+          </div>
+          <div className="full">
+            <input
+              type="checkbox"
+              id="useCss"
+              checked={useCss}
+              onChange={e => setUseCss(e.target.checked)}
+            />
+            <label htmlFor="useCss">Use CSS animations (GPU-accelerated)</label>
+          </div>
+        </div>
+
         <div className="row">
           <div className="full">
             <h2>Demo mode</h2>
@@ -340,6 +383,37 @@ export const App: React.FC = () => {
           </div>
         </div>
       </form>
+      <div style={{ textAlign: "center", margin: "20px 0" }}>
+        <button
+          onClick={() => setShowPerformanceTest(true)}
+          style={{
+            padding: "10px 20px",
+            fontSize: "16px",
+            backgroundColor: "#007bff",
+            color: "white",
+            border: "none",
+            borderRadius: "4px",
+            cursor: "pointer"
+          }}
+        >
+          Show Performance Test (50 Displays)
+        </button>
+        <button
+          onClick={() => setShowTripleDigit(true)}
+          style={{
+            padding: "10px 20px",
+            fontSize: "16px",
+            backgroundColor: "#007bff",
+            color: "white",
+            border: "none",
+            borderRadius: "4px",
+            cursor: "pointer",
+            marginLeft: "10px"
+          }}
+        >
+          Show Single Digit
+        </button>
+      </div>
     </div>
   );
 };

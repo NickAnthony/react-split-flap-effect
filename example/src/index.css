@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css?family=Roboto+Condensed&display=swap');
+@import url("https://fonts.googleapis.com/css?family=Roboto+Condensed&display=swap");
 
 * {
   box-sizing: border-box;
@@ -16,6 +16,12 @@ body {
 
 .demoFlapper [data-kind="digit"] {
   font-size: 30px;
+}
+
+.singleDigitFlapper {
+  font-size: 100px;
+  height: 100px;
+  width: 100px;
 }
 
 h2 {
@@ -69,8 +75,8 @@ label {
   }
 }
 
-input[type='text'],
-input[type='number'] {
+input[type="text"],
+input[type="number"] {
   width: 100%;
 }
 
