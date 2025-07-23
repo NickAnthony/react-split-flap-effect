@@ -151,7 +151,9 @@ export const FlapStackCSS: React.FC<FlapStackCSSProps> = ({
         clearTimeout(animationTimer.current);
       }
     };
-  }, [value, stack, timing, currentChar, isAnimating]);
+    // Only re-run when the target value (or stack / timing) really changes,
+    // leaving the internal animation state untouched.
+  }, [value, stack, timing]);
 
   return (
     <div
