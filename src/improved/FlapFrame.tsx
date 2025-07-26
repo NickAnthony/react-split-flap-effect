@@ -13,7 +13,7 @@ interface FlapFrameProps {
   css?: any;
 }
 
-export const FlapFrame: React.FC<FlapFrameProps> = ({
+const FlapFrameComponent: React.FC<FlapFrameProps> = ({
   char,
   nextChar,
   delay,
@@ -104,3 +104,24 @@ export const FlapFrame: React.FC<FlapFrameProps> = ({
     </div>
   );
 };
+
+// Memoize the component to prevent unnecessary re-renders
+// This is especially important during animations when multiple frames are rendered
+export const FlapFrame = React.memo(
+  FlapFrameComponent,
+  (prevProps, nextProps) => {
+    // Custom comparison function for better performance
+    // Return true if props are equal (skip re-render), false if different (re-render)
+    return (
+      prevProps.char === nextProps.char &&
+      prevProps.nextChar === nextProps.nextChar &&
+      prevProps.delay === nextProps.delay &&
+      prevProps.timing === nextProps.timing &&
+      prevProps.isStatic === nextProps.isStatic &&
+      prevProps.hinge === nextProps.hinge &&
+      prevProps.className === nextProps.className &&
+      // For css object, do a shallow comparison
+      JSON.stringify(prevProps.css) === JSON.stringify(nextProps.css)
+    );
+  }
+);

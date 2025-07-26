@@ -40,6 +40,14 @@ const buildSequence = (
   return sequence;
 };
 
+interface AnimationFrame {
+  currentChar: string;
+  nextChar: string;
+  delay: number;
+  timing: number;
+  isLast: boolean;
+}
+
 export const FlapStackImproved: React.FC<FlapStackImprovedProps> = ({
   stack,
   value,
@@ -50,14 +58,10 @@ export const FlapStackImproved: React.FC<FlapStackImprovedProps> = ({
   hinge = true
 }) => {
   const [displayValue, setDisplayValue] = useState<string>(value);
+  const [animationFrames, setAnimationFrames] = useState<AnimationFrame[]>([]);
   const [isAnimating, setIsAnimating] = useState(false);
-  const [currentChar, setCurrentChar] = useState<string>(value);
-  const [nextChar, setNextChar] = useState<string>(value);
-  const [isLastAnimation, setIsLastAnimation] = useState(false);
   const isFirstRender = useRef(true);
   const animationTimer = useRef<NodeJS.Timeout | null>(null);
-  const sequenceRef = useRef<string[]>([]);
-  const sequenceIndex = useRef(0);
   const targetValueRef = useRef(value);
 
   useEffect(() => {
@@ -65,8 +69,6 @@ export const FlapStackImproved: React.FC<FlapStackImprovedProps> = ({
     if (isFirstRender.current) {
       isFirstRender.current = false;
       setDisplayValue(value);
-      setCurrentChar(value);
-      setNextChar(value);
       targetValueRef.current = value;
       return;
     }
@@ -76,72 +78,52 @@ export const FlapStackImproved: React.FC<FlapStackImprovedProps> = ({
       targetValueRef.current = value;
 
       // Continue from current position if animating, otherwise from displayValue
-      const startPosition = isAnimating ? currentChar : displayValue;
+      const startPosition = displayValue;
       const sequence = buildSequence(stack, startPosition, value);
 
       if (sequence.length > 0) {
-        sequenceRef.current = sequence;
-        sequenceIndex.current = 0;
+        // Build all animation frames at once
+        const frames: AnimationFrame[] = [];
+        let accumulatedDelay = 0;
 
-        // Continue animation from current position
-        setCurrentChar(startPosition);
-        setNextChar(sequence[0]);
+        // Add all frames in the sequence
+        for (let i = 0; i < sequence.length; i++) {
+          const isLast = i === sequence.length - 1;
+          const currentChar = i === 0 ? startPosition : sequence[i - 1];
+          const nextChar = sequence[i];
+
+          frames.push({
+            currentChar,
+            nextChar,
+            delay: accumulatedDelay,
+            timing: isLast ? timing * 1.5 : timing, // Slower timing for last character
+            isLast
+          });
+
+          accumulatedDelay += isLast ? timing * 1.5 : timing;
+        }
+
+        // Set all frames at once - only one React update
+        setAnimationFrames(frames);
         setIsAnimating(true);
-        setIsLastAnimation(sequence.length === 1);
 
-        // Schedule the progression through the sequence
-        const animateNext = () => {
-          if (sequenceIndex.current < sequence.length) {
-            // Check if this is the last character in the sequence
-            const isLastCharacter =
-              sequenceIndex.current === sequence.length - 1;
-            // Use slower timing for the last character (1.5x slower)
-            const currentTiming = isLastCharacter ? timing * 1.5 : timing;
+        // Clear previous timer
+        if (animationTimer.current) {
+          clearTimeout(animationTimer.current);
+        }
 
-            // After animation completes, update for next frame
-            animationTimer.current = setTimeout(() => {
-              const currentIndex = sequenceIndex.current;
-              sequenceIndex.current++;
-
-              if (sequenceIndex.current >= sequence.length) {
-                // Animation complete
-                setDisplayValue(value);
-                setCurrentChar(value);
-                setNextChar(value);
-                setIsAnimating(false);
-                setIsLastAnimation(false);
-              } else {
-                // Move to next frame
-                const prevChar = sequence[currentIndex];
-                const nextCharInSequence = sequence[sequenceIndex.current];
-
-                // Brief pause to reset animation state
-                setIsAnimating(false);
-                setCurrentChar(prevChar);
-                setNextChar(prevChar);
-
-                // Use requestAnimationFrame to ensure the DOM updates before retriggering animation
-                requestAnimationFrame(() => {
-                  setCurrentChar(prevChar);
-                  setNextChar(nextCharInSequence);
-                  setIsAnimating(true);
-                  setIsLastAnimation(
-                    sequenceIndex.current === sequence.length - 1
-                  );
-                  animateNext();
-                });
-              }
-            }, currentTiming);
-          }
-        };
-
-        animateNext();
+        // Set timer for when animation completes
+        animationTimer.current = setTimeout(() => {
+          // Animation complete - only one React update at the end
+          setDisplayValue(value);
+          setAnimationFrames([]);
+          setIsAnimating(false);
+        }, accumulatedDelay);
       } else {
         // If no sequence needed, update immediately
         setDisplayValue(value);
-        setCurrentChar(value);
-        setNextChar(value);
-        setIsLastAnimation(false);
+        setAnimationFrames([]);
+        setIsAnimating(false);
         targetValueRef.current = value;
       }
     }
@@ -151,9 +133,7 @@ export const FlapStackImproved: React.FC<FlapStackImprovedProps> = ({
         clearTimeout(animationTimer.current);
       }
     };
-    // Only re-run when the target value (or stack / timing) really changes,
-    // leaving the internal animation state untouched.
-  }, [value, stack, timing]);
+  }, [value, stack, timing, displayValue]);
 
   return (
     <div
@@ -162,15 +142,34 @@ export const FlapStackImproved: React.FC<FlapStackImprovedProps> = ({
       data-mode={mode}
       data-kind="digit"
     >
-      <FlapFrame
-        char={currentChar}
-        nextChar={nextChar}
-        delay={0}
-        timing={isLastAnimation ? timing * 3 : timing}
-        isStatic={!isAnimating}
-        hinge={hinge}
-        className={className}
-      />
+      {isAnimating && animationFrames.length > 0 ? (
+        // During animation, render all frames with their delays
+        <>
+          {animationFrames.map((frame, index) => (
+            <FlapFrame
+              key={`${frame.currentChar}-${frame.nextChar}-${index}`}
+              char={frame.currentChar}
+              nextChar={frame.nextChar}
+              delay={frame.delay}
+              timing={frame.timing}
+              isStatic={false}
+              hinge={hinge}
+              className={className}
+            />
+          ))}
+        </>
+      ) : (
+        // When not animating, render a single static frame
+        <FlapFrame
+          char={displayValue}
+          nextChar={displayValue}
+          delay={0}
+          timing={timing}
+          isStatic={true}
+          hinge={hinge}
+          className={className}
+        />
+      )}
     </div>
   );
 };

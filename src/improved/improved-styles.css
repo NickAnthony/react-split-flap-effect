@@ -58,6 +58,18 @@
   perspective: 1000px;
   transform-style: preserve-3d;
   background-color: inherit; /* Ensure frame inherits background */
+
+  /* Hide frames that haven't started animating yet */
+  &[style*="--top-delay"]:not([style*="--top-delay: 0ms"]) {
+    opacity: 0;
+    animation: fadeIn 0ms linear var(--top-delay) forwards;
+  }
+}
+
+@keyframes fadeIn {
+  to {
+    opacity: 1;
+  }
 }
 
 /* Half flap styles for CSS animations */
@@ -111,6 +123,7 @@
   animation: flipTop var(--flap-timing, 300ms) ease-in var(--top-delay, 0ms)
     forwards;
   z-index: 4; /* Highest - animating top flap */
+  animation-fill-mode: both; /* Maintain state before and after animation */
 }
 
 .flapHalf.bottom.animated {
@@ -118,6 +131,7 @@
     var(--bottom-delay, 0ms) forwards;
   z-index: 3; /* Second highest - animating bottom flap */
   visibility: hidden; /* Initially hidden until animation starts */
+  animation-fill-mode: both; /* Maintain state before and after animation */
 }
 
 /* Back face (next character preview) */
