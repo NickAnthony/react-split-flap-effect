@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { FlapStack } from "./FlapStack";
-import { FlapStackCSS } from "./FlapStackCSS";
+import { FlapStackCSS } from "./improved/FlapStackCSS";
 import { Presets } from "./Presets";
 
 const Modes = {

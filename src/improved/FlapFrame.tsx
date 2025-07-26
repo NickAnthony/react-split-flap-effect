@@ -1,6 +1,6 @@
 import classnames from "classnames";
 import React from "react";
-import styles from "./styles.css";
+import styles from "./improved-styles.css";
 
 interface FlapFrameProps {
   char: string;

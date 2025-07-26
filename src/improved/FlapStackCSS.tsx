@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { FlapFrame } from "./FlapFrame";
-import styles from "./styles.css";
+import styles from "./improved-styles.css";
 
 interface FlapStackCSSProps {
   stack: string[];
