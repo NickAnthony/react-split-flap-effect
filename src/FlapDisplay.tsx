@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { FlapStack } from "./FlapStack";
-import { FlapStackCSS } from "./improved/FlapStackCSS";
 import { Presets } from "./Presets";
+import { FlapStackImproved } from "./improved/FlapStackImproved";
 
 const Modes = {
   Numeric: "num",
@@ -32,7 +32,7 @@ export interface FlapDisplayProps {
   timing?: number;
   hinge?: boolean;
   render?: (props: RenderProps) => React.ReactElement;
-  useCss?: boolean;
+  useImproved?: boolean;
   // Additional props that will be passed to FlapStack
   [key: string]: any;
 }
@@ -67,7 +67,7 @@ export const FlapDisplay: React.FC<FlapDisplayProps> = ({
   render,
   timing = 300,
   hinge = true,
-  useCss = true,
+  useImproved = true,
   ...restProps
 }) => {
   const [stack, setStack] = useState<string[]>([]);
@@ -110,7 +110,7 @@ export const FlapDisplay: React.FC<FlapDisplayProps> = ({
   }, [value, chars, words, length, padChar, padMode]);
 
   useEffect(() => {
-    const StackComponent = useCss ? FlapStackCSS : FlapStack;
+    const StackComponent = useImproved ? FlapStackImproved : FlapStack;
 
     setChildren(
       digits.map((digit, i) => (
@@ -125,7 +125,15 @@ export const FlapDisplay: React.FC<FlapDisplayProps> = ({
         />
       ))
     );
-  }, [digits, stack, mode, timing, hinge, useCss, ...Object.values(restProps)]);
+  }, [
+    digits,
+    stack,
+    mode,
+    timing,
+    hinge,
+    useImproved,
+    ...Object.values(restProps)
+  ]);
 
   return render ? (
     render({ id, className, css, ...restProps, children })

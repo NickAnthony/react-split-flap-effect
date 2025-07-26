@@ -46,7 +46,7 @@ export const TripleDigit: React.FC = () => {
             padChar={" "}
             padMode={"auto"}
             style={{ fontSize: "100px", height: "100px", width: "300px" }}
-            useCss={true}
+            useImproved={true}
           />
         </div>
       </div>

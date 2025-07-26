@@ -42,7 +42,7 @@ export const App: React.FC = () => {
   const [padMode, setPadMode] = useState<PadMode>("auto");
   const [value, setValue] = useState("");
   const [hinge, setHinge] = useState(true);
-  const [useCss, setUseCss] = useState(true);
+  const [useImproved, setUseImproved] = useState(true);
 
   const modeRef = useRef(mode);
   modeRef.current = mode;
@@ -121,7 +121,7 @@ export const App: React.FC = () => {
           hinge={hinge}
           padChar={padChar}
           padMode={padMode}
-          useCss={useCss}
+          useImproved={useImproved}
         />
       </div>
 
@@ -133,9 +133,9 @@ export const App: React.FC = () => {
           <div className="full">
             <input
               type="checkbox"
-              id="useCss"
-              checked={useCss}
-              onChange={e => setUseCss(e.target.checked)}
+              id="useImproved"
+              checked={useImproved}
+              onChange={e => setUseImproved(e.target.checked)}
             />
             <label htmlFor="useCss">Use CSS animations (GPU-accelerated)</label>
           </div>

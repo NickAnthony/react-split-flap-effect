@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { FlapFrame } from "./FlapFrame";
 import styles from "./improved-styles.css";
 
-interface FlapStackCSSProps {
+interface FlapStackImprovedProps {
   stack: string[];
   value: string;
   timing: number;
@@ -40,7 +40,7 @@ const buildSequence = (
   return sequence;
 };
 
-export const FlapStackCSS: React.FC<FlapStackCSSProps> = ({
+export const FlapStackImproved: React.FC<FlapStackImprovedProps> = ({
   stack,
   value,
   timing, // This is the timing between each character flip, not the timing of the animation of the character itself
