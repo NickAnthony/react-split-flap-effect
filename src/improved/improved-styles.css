@@ -22,6 +22,8 @@
 /* CSS-based animation styles */
 :root {
   --flap-timing: 300ms;
+  --top-delay: 0ms;
+  --bottom-delay: 0ms;
 }
 
 /* New keyframes for CSS-based animations */
@@ -106,12 +108,14 @@
 
 /* Animated states */
 .flapHalf.top.animated {
-  animation: flipTop var(--flap-timing, 300ms) ease-in forwards;
+  animation: flipTop var(--flap-timing, 300ms) ease-in var(--top-delay, 0ms)
+    forwards;
   z-index: 4; /* Highest - animating top flap */
 }
 
 .flapHalf.bottom.animated {
-  animation: flipBottom var(--flap-timing, 300ms) ease-out forwards;
+  animation: flipBottom var(--flap-timing, 300ms) ease-out
+    var(--bottom-delay, 0ms) forwards;
   z-index: 3; /* Second highest - animating bottom flap */
   visibility: hidden; /* Initially hidden until animation starts */
 }

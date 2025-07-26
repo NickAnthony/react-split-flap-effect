@@ -1,5 +1,5 @@
 import classnames from "classnames";
-import React from "react";
+import React, { useMemo } from "react";
 import styles from "./improved-styles.css";
 
 interface FlapFrameProps {
@@ -30,19 +30,36 @@ export const FlapFrame: React.FC<FlapFrameProps> = ({
   const flapDelay = delay + flapTimingHalf;
   const frameClasses = classnames(styles.flapFrame, className);
 
+  // Memoize all styles before any conditional logic
+  const staticFrameStyle = useMemo(
+    () => ({
+      ...css,
+      position: "absolute" as const,
+      width: "100%",
+      height: "100%",
+      "--flap-timing": `${flapTimingHalf}ms`
+    }),
+    [css, flapTimingHalf]
+  );
+
+  const animatedFrameStyle = useMemo(
+    () => ({
+      ...css,
+      position: "absolute" as const,
+      width: "100%",
+      height: "100%",
+      zIndex: delay, // Later frames should be on top
+      "--flap-timing": `${flapTiming / 2}ms`, // Set CSS variable for animation duration
+      "--top-delay": `${delay}ms`,
+      "--bottom-delay": `${flapDelay}ms`
+    }),
+    [css, delay, flapTiming, flapDelay]
+  );
+
   if (isStatic) {
     // For the final character, render without animations
     return (
-      <div
-        className={frameClasses}
-        style={{
-          ...css,
-          position: "absolute",
-          width: "100%",
-          height: "100%",
-          "--flap-timing": `${flapTimingHalf}ms` // Set CSS variable even for static frames
-        }}
-      >
+      <div className={frameClasses} style={staticFrameStyle}>
         <div className={classnames(styles.flapHalf, styles.top, styles.static)}>
           <span className={styles.flapContent}>{char}</span>
         </div>
@@ -56,27 +73,15 @@ export const FlapFrame: React.FC<FlapFrameProps> = ({
     );
   }
 
-  const frameStyle = {
-    ...css,
-    position: "absolute" as const,
-    width: "100%",
-    height: "100%",
-    zIndex: delay, // Later frames should be on top
-    "--flap-timing": `${flapTiming / 2}ms` // Set CSS variable for animation duration
-  };
-
   return (
-    <div className={frameClasses} style={frameStyle}>
+    <div className={frameClasses} style={animatedFrameStyle}>
       {/* Top half of next character, displayed when top flap is animating down */}
       <div className={classnames(styles.flapHalf, styles.top, styles.back)}>
         <span className={styles.flapContent}>{nextChar}</span>
       </div>
 
       {/* Current character top half, animates down */}
-      <div
-        className={classnames(styles.flapHalf, styles.top, styles.animated)}
-        style={{ animationDelay: `${delay}ms` }}
-      >
+      <div className={classnames(styles.flapHalf, styles.top, styles.animated)}>
         <span className={styles.flapContent}>{char}</span>
       </div>
 
@@ -90,7 +95,6 @@ export const FlapFrame: React.FC<FlapFrameProps> = ({
       {/* Next character bottom half, animates in */}
       <div
         className={classnames(styles.flapHalf, styles.bottom, styles.animated)}
-        style={{ animationDelay: `${flapDelay}ms` }} // Half of frame time
       >
         <span className={styles.flapContent}>{nextChar}</span>
       </div>
