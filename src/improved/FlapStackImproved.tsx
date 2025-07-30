@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
+import { useFlapDisplayScheduler } from "./FlapDisplayProvider";
 import { FlapFrame } from "./FlapFrame";
 import styles from "./improved-styles.css";
 
@@ -63,6 +64,7 @@ export const FlapStackImproved: React.FC<FlapStackImprovedProps> = ({
   const isFirstRender = useRef(true);
   const animationTimer = useRef<NodeJS.Timeout | null>(null);
   const targetValueRef = useRef(value);
+  const scheduler = useFlapDisplayScheduler();
 
   useEffect(() => {
     // On first render, just show the value without animation
@@ -82,6 +84,9 @@ export const FlapStackImproved: React.FC<FlapStackImprovedProps> = ({
       const sequence = buildSequence(stack, startPosition, value);
 
       if (sequence.length > 0) {
+        // Get global delay for this digit
+        const globalDelay = scheduler.getDigitStartDelay();
+
         // Build all animation frames at once
         const frames: AnimationFrame[] = [];
         let accumulatedDelay = 0;
@@ -95,7 +100,7 @@ export const FlapStackImproved: React.FC<FlapStackImprovedProps> = ({
           frames.push({
             currentChar,
             nextChar,
-            delay: accumulatedDelay,
+            delay: globalDelay + accumulatedDelay, // Add global delay to local delay
             timing: isLast ? timing * 1.5 : timing, // Slower timing for last character
             isLast
           });
@@ -118,7 +123,7 @@ export const FlapStackImproved: React.FC<FlapStackImprovedProps> = ({
           setDisplayValue(value);
           setAnimationFrames([]);
           setIsAnimating(false);
-        }, accumulatedDelay);
+        }, globalDelay + accumulatedDelay); // Include global delay in total duration
       } else {
         // If no sequence needed, update immediately
         setDisplayValue(value);
