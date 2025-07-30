@@ -28,7 +28,9 @@ const FlapFrameComponent: React.FC<FlapFrameProps> = ({
   const flapTiming = timing / 2;
   const flapTimingHalf = flapTiming / 2;
   const flapDelay = delay + flapTimingHalf;
-  const frameClasses = classnames(styles.flapFrame, className);
+  const frameClasses = classnames(styles.flapFrame, className, {
+    [styles.animating]: !isStatic
+  });
 
   // Memoize all styles before any conditional logic
   const staticFrameStyle = useMemo(
